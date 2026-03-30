@@ -23,6 +23,16 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   body {
     font-family: 'Sora', sans-serif;
     background: var(--bg);
@@ -134,6 +144,14 @@
     margin-top: 10px;
     color: var(--muted);
     font-size: 13px;
+  }
+
+  .site-header .meta {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.4px;
   }
 
   .module {
@@ -451,7 +469,8 @@
     <div class="badge">⚡ Pass-Ready Edition</div>
     <div class="badge2">✅ Gap-Filled v2</div>
     <h1>AZ-104 <span>Microsoft Azure Administrator</span><br>Complete Study Guide</h1>
-    <p>All exam domains covered — original guide + all missing high-weight topics: Conditional Access, PIM, Key Vault, Firewall, NAT Gateway, AKS, blob versioning, Cost Management, Advisor, Application Insights, VM Extensions, and more.</p>
+    <p>All AZ-104 skill areas covered with high-yield topics, scenario-first notes, and quick revision cues for fast exam prep.</p>
+    <div class="meta">Reviewed: 2026-03-30 · Target: current AZ-104 objective domains · Focus: maximize pass readiness (no guaranteed outcomes)</div>
   </div>
 
   <div class="progress-header">
@@ -1740,13 +1759,37 @@
 <script>
   const sections = document.querySelectorAll('section[id], div[id]');
   const navLinks = document.querySelectorAll('.nav-link');
-  window.addEventListener('scroll', () => {
+  let isTicking = false;
+
+  function updateActiveNav() {
+    const threshold = window.scrollY + 96;
     let current = '';
-    sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+
+    sections.forEach((section) => {
+      if (threshold >= section.offsetTop) current = section.id;
     });
-    navLinks.forEach(l => {
-      l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+
+    navLinks.forEach((link) => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+
+    isTicking = false;
+  }
+
+  function onScroll() {
+    if (!isTicking) {
+      window.requestAnimationFrame(updateActiveNav);
+      isTicking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('load', updateActiveNav);
+  window.addEventListener('hashchange', updateActiveNav);
+
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      window.requestAnimationFrame(updateActiveNav);
     });
   });
 </script>
